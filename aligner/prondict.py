@@ -37,6 +37,9 @@ class PronDict(object):
 
     @staticmethod
     def pronify(source):
+        """
+        Create a list of (index, word, [phones]) from source
+        """
         for (i, line) in enumerate(source, 1):
             if line.startswith(";"):
                 continue

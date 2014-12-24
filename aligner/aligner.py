@@ -53,6 +53,7 @@ class Aligner(object):
         hmmdir = os.environ["TMPDIR"] if "TMPDIR" in os.environ else None
         self.hmmdir = mkdtemp(dir=hmmdir)
         # config options
+        self.global_proto_dir = os.path.join(opts["global_proto_dir"])
         self.HCompV_opts = opts["HCompV"]
         self.HERest_cfg = os.path.join(self.hmmdir, "HERest.cfg")
         opts2cfg(self.HERest_cfg, opts["HERest"])
@@ -77,54 +78,40 @@ class Aligner(object):
 
     def flatstart(self, corpus):
         self.epochs = 1
-        # make `proto`
-        self.proto = os.path.join(self.hmmdir, PROTO)
-        with open(self.proto, "w") as proto:
-            # FIXME this is highly specific to the default acoustic
-            # features, but figuring out the number of means and variances
-            # needed from the HCopy configuration file is not trivial.
-            means = " ".join(["0.0" for _ in range(39)])
-            varg = " ".join(["1.0" for _ in range(39)])
-            print("""~o <VECSIZE> 39 <MFCC_D_A_0>
-~h "proto"
-<BEGINHMM>
-<NUMSTATES> 5""", file=proto)
-            for i in range(2, 5):
-                print("<STATE> {}".format(i), file=proto)
-                print("<MEAN> 39", file=proto)
-                print(means, file=proto)
-                print("<VARIANCE> 39", file=proto)
-                print(varg, file=proto)
-            print("""<TRANSP> 5
- 0.0 1.0 0.0 0.0 0.0
- 0.0 0.6 0.4 0.0 0.0
- 0.0 0.0 0.6 0.4 0.0
- 0.0 0.0 0.0 0.7 0.3
- 0.0 0.0 0.0 0.0 0.0
-<ENDHMM>""", file=proto)
-        # make `vFloors`
-        check_call(["HCompV", "-f", str(self.HCompV_opts["F"]),
-                              "-C", self.HERest_cfg,
-                              "-S", corpus.feature_scp,
-                              "-M", self.curdir, self.proto])
-        # make `macros`
-        # get first three lines from local proto
+
+        with open(corpus.phons, "r") as phons:
+            for phone in phons:
+                phone_proto_path = os.path.join(self.global_proto_dir, PROTO) # By default, use the generic prototype provided with the tool-kit
+                if(os.path.isfile(os.path.join(self.global_proto_dir, phone.strip()))): # if user has a prototype defined for this phone then use it
+                    phone_proto_path = os.path.join(self.global_proto_dir, phone.strip())
+                    
+                check_call(["HCompV", "-f", str(self.HCompV_opts["F"]),
+                                      "-C", self.HERest_cfg,
+                                      "-S", corpus.feature_scp,
+                                      "-M", self.curdir,
+                                       phone_proto_path])
+                
+                # add phone to `hmmdefs`
+                with open(os.path.join(self.curdir, HMMDEFS), "a") as hmmdefs:
+                    with open(os.path.join(self.curdir, os.path.split(phone_proto_path)[1]), "r") as proto:
+                        n = 0 # number of lines to omit from local proto (we omit the macros at top)
+                        alllines = proto.readlines()
+                        while(alllines[n].strip() != "<BEGINHMM>"): # Start adding lines when hmm definition starts
+                            n += 1
+                        protolines = alllines[n:]
+                        print('~h "{}"'.format(phone.rstrip()), file=hmmdefs)
+                        print("".join(protolines).rstrip(), file=hmmdefs)
+
+        # read the global macros file and append its content to local macros
         with open(os.path.join(self.curdir, MACROS), "a") as macros:
-            with open(os.path.join(self.curdir,
-                      os.path.split(self.proto)[1]), "r") as proto:
-                for _ in range(3):
-                    print(proto.readline().strip(), file=macros)
+            with open(os.path.join(self.curdir, os.path.split(phone_proto_path)[1]), "r") as proto:
+                line = proto.readline().strip()
+                while(line.strip()[0:2] != "~h"):
+                    print(line, file=macros)
+                    line = proto.readline().strip()
             # get remaining lines from `vFloors`
             with open(os.path.join(self.curdir, VFLOORS), "r") as vfloors:
                 print("".join(vfloors.readlines()).rstrip(), file=macros)
-        # make `hmmdefs`
-        with open(os.path.join(self.curdir, HMMDEFS), "w") as hmmdefs:
-            with open(self.proto, "r") as proto:
-                protolines = proto.readlines()[2:]
-            with open(corpus.phons, "r") as phons:
-                for phone in phons:
-                    print('~h "{}"'.format(phone.rstrip()), file=hmmdefs)
-                    print("".join(protolines).rstrip(), file=hmmdefs)
 
     def train(self, corpus, epochs):
         """
