@@ -23,6 +23,7 @@
 Utilities for audio resampling (etc.)
 """
 
+import wave
 
 from numpy import asarray
 from scipy.io import wavfile
@@ -38,6 +39,14 @@ class WavFile(object):
     def __init__(self, signal, Fs):
         self.signal = asarray(signal)
         self.Fs = Fs
+
+    @staticmethod
+    def samplerate(filename):
+        """
+        Get samplerate without reading the entire wav file into memory
+        """
+        with wave.open(filename, "r") as source:
+            return source.getframerate()
 
     @classmethod
     def from_file(cls, filename):

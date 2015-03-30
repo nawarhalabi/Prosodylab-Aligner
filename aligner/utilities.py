@@ -8,20 +8,25 @@ import logging
 
 # global variables
 
-SP = "SP"
+SP = "sp"
 SIL = "sil"
 TEMP = "temp"
 
-ALIGNED = "aligned.mlf"
+EPOCHS = 5
+
+MISSING = "missing.txt"
+OOV = "OOV.txt"
+
 CONFIG = "config.yaml"
 DICT = "dict"
 HMMDEFS = "hmmdefs"
 MACROS = "macros"
-MISSING = "missing.txt"
 PROTO = "proto"
-OOV = "OOV.txt"
-SCORES = "scores.txt"
 VFLOORS = "vFloors"
+
+ALIGNED = ".aligned.mlf"
+SCORES = ".scores.csv"
+
 
 # samplerates which appear to be HTK-compatible (all divisors of 1e7)
 SAMPLERATES = [4000, 8000, 10000, 12500, 15625, 16000, 20000, 25000,
@@ -69,8 +74,7 @@ def resolve_opts(args):
         exit(1)
     opts["dictionary"] = args.dictionary
     if not args.epochs:
-        logging.error("Epochs (-e) not specified.")
-        exit(1)
+        args.epochs = EPOCHS
     opts["epochs"] = args.epochs
     # could be either, and the command line takes precedent.
     try:

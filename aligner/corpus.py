@@ -40,7 +40,7 @@ from .utilities import splitname, mkdir_p, opts2cfg, \
 
 
 # regexp for inspecting phones
-VALID_PHONE = r"^[a-zA-Z\-\@\^]+[0-9]?$"
+VALID_PHONE = r"^[^\d\s]+[0-9]?$"
 
 
 class Corpus(object):
@@ -167,7 +167,8 @@ class Corpus(object):
         temp = os.path.join(self.tmpdir, TEMP)
         # run HDMan
         with open(temp, "w") as ded:
-            print("AS {0}\nMP {1} {1} {0}".format(SP, SIL), file=ded)
+            print("""AS {0}\nMP {1} {1} {0}
+""".format(SP, SIL), file=ded)
         check_call(["HDMan", "-m",
                              "-g", temp,
                              "-w", self.words,
@@ -201,8 +202,9 @@ DE {1}
                 (_, filename) = os.path.split(audiofile)
                 (basename, _) = os.path.splitext(filename)
                 featurefile = os.path.join(self.auddir, basename + ".mfc")
-                w = WavFile.from_file(audiofile)
-                if w.Fs != self.samplerate:
+                Fs = WavFile.samplerate(audiofile)
+                if Fs != self.samplerate:
+                    w = WavFile.from_file(audiofile)
                     new_wav = os.path.join(self.auddir, filename)
                     logging.warning("Resampling '{}'.".format(audiofile))
                     w.resample_bang(self.samplerate)
