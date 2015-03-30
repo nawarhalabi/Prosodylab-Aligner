@@ -1,0 +1,56 @@
+# for human reading only
+authors: Nawar Halabi
+language: Arabic
+citation: "K. Gorman, J. Howell, and M. Wagner. 2011. Prosodylab-Aligner: A tool for forced alignment of laboratory speech. Canadian Acoustics, 39(3), 192-193."
+URL: http://prosodylab.org/tools/aligner/
+
+# basic features
+samplerate: 16000 # in Hz
+phoneset: [AH  , b   , t   , ^  , j   , H  , x  , d  , TH , r  ,
+           z   , s   , SH  , S   , D   , T  , Z  , E  , g  , f  ,
+           q   , k   , l   , m   , n   , h  , w  , y  , v  , p  ,
+           J   , G   , aa  , uu0 , ii0 , a  , u0 , i0 , AA , UU0,
+           II0 , A   , U0  , I0  , u1  , i1 , uu1, ii1, U1 , I1 ,
+           UU1 , II1 , AHAH, bb  , tt  , ^^ , jj , HH , xx , dd ,
+           THTH, rr  , zz  , ss  , SHSH, SS , DD , TT , ZZ , EE ,
+           gg  , ff  , qq  , kk  , ll  , mm , nn , hh , ww , yy ,
+           vv  , pp  , JJ  , GG]
+
+global_proto_dir: models # where prototypes are defined that specify the topology of the models
+
+# specs for feature extractor; change at your own risk
+HCopy:
+    SOURCEKIND: WAVEFORM
+    SOURCEFORMAT: WAVE
+    TARGETRATE: 100000.0
+    TARGETKIND: MFCC_D_A_0
+    WINDOWSIZE: 250000.0
+    PREEMCOEF: 0.97
+    USEHAMMING: T
+    ENORMALIZE: T
+    CEPLIFTER: 22
+    NUMCHANS: 20
+    NUMCEPS: 12
+
+# pruning parameters, to use globally; change at your own risk
+pruning: [250, 100, 4000]
+
+# specs for flat start; change at your own risk
+HCompV:
+    F: .01
+
+# specs for estimation; change at your own risk
+HERest:
+    TARGETRATE: 100000.0
+    TARGETKIND: MFCC_D_A_0
+    WINDOWSIZE: 250000.0
+    PREEMCOEF: 0.97
+    USEHAMMING: T
+    ENORMALIZE: T
+    CEPLIFTER: 22
+    NUMCHANS: 20
+    NUMCEPS: 12
+
+# specs for the decoder; change at your own risk
+HVite:
+    SFAC: 5
