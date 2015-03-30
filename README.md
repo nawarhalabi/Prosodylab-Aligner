@@ -221,6 +221,10 @@ Sometimes there are processing errors that occur. These can often be fixed by en
     
 Provide your password, if necessary.
 
+#### Error 8522 HVite
+
+The HTK version 3.4.1 might emit this error for no apparent reason. A solution that worked for us was to recompile HTK 3.4.1 by running the "export CPPFLAGS=-UPHNALG" before running "configure" and then "make install" when compiling HTK 3.4.1. This Should be done in the same shell.
+
 ### Training your own models
 
 The aligner module also allows you to train your own models, 
@@ -246,6 +250,10 @@ Lastly, the `-t` flag indicates the source of the training data. In the example,
     ...
 
 Resampling this way can take a long time, especially with large sets of data. It is therefore recommended that samplerate specifications are made using `resample.sh`. This requires installing SoX (see above installation instructions).
+
+### HMM Topology
+
+You can - optionally - change the default topology of the HMMs used for all or specific phones. Before running, you can either edit the model/proto file which is used by default for all phones or create a new file containing an HTK HMM definition and name it exactly as one of the phones and this phone's default HMM topology (in proto) will be overridden by this files HMM. We provide proto with the aligner.
 
 ### Resampling Data Files
 
