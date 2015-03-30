@@ -85,7 +85,8 @@ class Aligner(object):
                 if(os.path.isfile(os.path.join(self.global_proto_dir, phone.strip()))): # if user has a prototype defined for this phone then use it
                     phone_proto_path = os.path.join(self.global_proto_dir, phone.strip())
                     
-                check_call(["HCompV", "-f", str(self.HCompV_opts["F"]),
+                check_call(["HCompV", "-m",
+                                      "-f", str(self.HCompV_opts["F"]),
                                       "-C", self.HERest_cfg,
                                       "-S", corpus.feature_scp,
                                       "-M", self.curdir,
