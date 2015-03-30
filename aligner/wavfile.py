@@ -45,8 +45,10 @@ class WavFile(object):
         """
         Get samplerate without reading the entire wav file into memory
         """
-        with wave.open(filename, "r") as source:
-            return source.getframerate()
+        #with wave.open(filename, "r") as source:
+        #    return source.getframerate()
+        (Fs, signal) = wavfile.read(filename)
+        return(Fs)
 
     @classmethod
     def from_file(cls, filename):

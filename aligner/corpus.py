@@ -70,7 +70,7 @@ class Corpus(object):
         # dictionary
         self.dictionary = opts["dictionary"]
         self.thedict = PronDict(self.dictionary, self.phoneset)
-        #self.thedict[SIL] = [SIL]
+        self.thedict[SIL] = [SIL]
         self.taskdict = os.path.join(self.tmpdir, "taskdict")
         # word and phone lists
         self.phons = os.path.join(self.tmpdir, "phons")
