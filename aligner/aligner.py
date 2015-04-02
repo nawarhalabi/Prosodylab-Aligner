@@ -77,6 +77,9 @@ class Aligner(object):
 		mkdir_p(self.nxtdir)
 
 	def bootstrap(self, corpus):
+		"""
+		Use manually annotated data to start the annotation
+		"""
 		self.epochs = 1
 		
 		with open(corpus.phons, "r") as phons:

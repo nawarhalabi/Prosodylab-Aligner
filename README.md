@@ -55,6 +55,8 @@ Gorman, Kyle, Jonathan Howell and Michael Wagner. 2011. Prosodylab-Aligner: A To
     -a                  Directory of data to be aligned
 
     -w                  Location to write serialized model
+	
+    -tg	                Directory of TextGrids to be used for bootstrapping
 
 ## FAQ
 
@@ -221,10 +223,6 @@ Sometimes there are processing errors that occur. These can often be fixed by en
     
 Provide your password, if necessary.
 
-#### Error 8522 HVite
-
-The HTK version 3.4.1 might emit this error for no apparent reason. A solution that worked for us was to recompile HTK 3.4.1 by running the "export CPPFLAGS=-UPHNALG" before running "configure" and then "make install" when compiling HTK 3.4.1. This Should be done in the same shell.
-
 ### Training your own models
 
 The aligner module also allows you to train your own models, 
@@ -254,6 +252,10 @@ Resampling this way can take a long time, especially with large sets of data. It
 ### HMM Topology
 
 You can - optionally - change the default topology of the HMMs used for all or specific phones. Before running, you can either edit the model/proto file which is used by default for all phones or create a new file containing an HTK HMM definition and name it exactly as one of the phones and this phone's default HMM topology (in proto) will be overridden by this files HMM. We provide proto with the aligner.
+
+### Bootstrap with Manual annotations
+
+In training mode, the user can optionally specify - using the (-tg) argument - a directory of TextGrid files named the same as the sound data provided. These files should contain alignment data and will be used to bootstrap the training at the first stage of training. This sometimes improves accuracy of the alignment.
 
 ### Resampling Data Files
 

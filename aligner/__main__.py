@@ -95,6 +95,7 @@ if args.train:
     aligner = Aligner(opts)
     logging.info("Training aligner on corpus '{}'.".format(args.train))
 
+	#if the user provides a textgrids (-tg) argument, run a bootstrap stage at first
     if(args.textgrids):
         aligner.HTKbook_training_regime(corpus, opts["epochs"],
                                     flatstart=False, bootstrap=True)
