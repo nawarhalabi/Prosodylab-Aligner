@@ -50,7 +50,7 @@ class Corpus(object):
     is ready for training or aligning.
     """
 
-    def __init__(self, dirname, opts):
+    def __init__(self, dirname, opts, textgrids):
         # temporary directories for stashing the data
         tmpdir = os.environ["TMPDIR"] if "TMPDIR" in os.environ else None
         self.tmpdir = mkdtemp(dir=tmpdir)
@@ -90,6 +90,11 @@ class Corpus(object):
         self._prepare_label(labelfiles)
         self._prepare_audio(audiofiles)
         self._extract_features()
+        #Generate label files with boundary times from textgrids
+        self.labelsDir = os.path.join(self.tmpdir, "textgrids")
+        mkdir_p(self.labelsDir)
+        if(textgrids):
+            self._prepare_labels_from_textgrids(textgrids)
 
     def _lists(self, dirname):
         """
@@ -218,6 +223,42 @@ DE {1}
         Compute audio features
         """
         check_call(["HCopy", "-C", self.HCopy_cfg, "-S", self.audio_scp])
+
+    def _prepare_labels_from_textgrids(self, textgrids):
+        """
+        Write the Praat textgrid files' contents into label files (.lab)
+        to prepare for bootstrapping (training on manually annotated data.
+        """
+        textgridfiles = glob(os.path.join(textgrids, "*.TextGrid"))
+        for textgridfile in textgridfiles:
+            with open(textgridfile) as grid:
+                lines = grid.readlines()
+                labels = ""
+                for i in range(0, len(lines)):
+                    #once at an InterbalTier called phones
+                    if lines[i].strip() == "class = \"IntervalTier\"" and i < len(lines) - 1 and lines[i + 1].strip() == "name = \"phones\"":
+                        inIntervals = False
+                        for j in range(i + 1, len(lines)):
+                            if(lines[j].strip().split(' ')[0].strip() == "item"):
+                                break
+                            if(lines[j].strip().split(' ')[0].strip() in ["intervals"]):
+                                inIntervals = True
+                                continue
+                            if(inIntervals):
+                                key = lines[j].strip().split('=')[0].strip()
+                                val = lines[j].strip().split('=')[1].strip()
+                                if(key != "text"):
+                                    #convert seconds to 100ns for boundaries
+                                    labels += str(int(float(val.strip('"')) * 10000000)) + ' '
+                                else:
+                                    #get the boundaries' labels except for ...
+                                    if(not val.strip('"') in [SP]):
+                                        labels += val.strip('"') + '\n'
+                                    else
+                                        labels += SIL + '\n'
+                        break
+                with open(os.path.join(self.labelsDir, os.path.basename(textgridfile).split('.')[0] + ".lab"), 'w') as labelFile:
+                    labelFile.write(labels.strip())
 
     def __del__(self):
         rmtree(self.tmpdir) 

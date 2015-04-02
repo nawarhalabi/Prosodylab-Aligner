@@ -777,7 +777,7 @@ class MLF(object):
                 source.close()
                 break
 
-    def write(self, prefix=""):
+    def write(self, prefix="", null=""):
         """ 
         Write the current state into Praat-formatted TextGrids. The 
         filenames that the output is stored in are taken from the HTK 
@@ -792,7 +792,7 @@ class MLF(object):
             (_, tail) = os.path.split(grid.name)
             (root, _) = os.path.splitext(tail)
             my_path = os.path.join(prefix, root + ".TextGrid")
-            grid.write(codecs.open(my_path, "w", "UTF-8"))
+            grid.write(codecs.open(my_path, "w", "UTF-8"), null)
         return len(self.grids)
 
 

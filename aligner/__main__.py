@@ -35,7 +35,7 @@ from .aligner import Aligner
 from .archive import Archive
 from .textgrid import MLF
 from .utilities import splitname, resolve_opts, \
-                       ALIGNED, CONFIG, HMMDEFS, MACROS, SCORES
+                       ALIGNED, CONFIG, HMMDEFS, MACROS, SCORES, SIL
 
 from argparse import ArgumentParser
 
@@ -56,6 +56,8 @@ argparser.add_argument("-s", "--samplerate", type=int,
                        help="analysis samplerate (in Hz)")
 argparser.add_argument("-e", "--epochs", type=int,
                        help="# of epochs of training per round")
+argparser.add_argument("-tg", "--textgrids",
+                       help="directory to input textgrids for bootstrapping training")
 input_group = argparser.add_argument_group()
 input_group.add_argument("-r", "--read",
                          help="source for a precomputed acoustic model")
@@ -88,11 +90,16 @@ if args.train:
         exit(1)
     logging.info("Preparing corpus '{}'.".format(args.train))
     opts = resolve_opts(args)
-    corpus = Corpus(args.train, opts)
+    corpus = Corpus(args.train, opts, args.textgrids)
     logging.info("Preparing aligner.")
     aligner = Aligner(opts)
     logging.info("Training aligner on corpus '{}'.".format(args.train))
-    aligner.HTKbook_training_regime(corpus, opts["epochs"],
+
+    if(args.textgrids):
+        aligner.HTKbook_training_regime(corpus, opts["epochs"],
+                                    flatstart=False, bootstrap=True)
+    else:
+        aligner.HTKbook_training_regime(corpus, opts["epochs"],
                                     flatstart=(args.read is None))
 else:
     if not args.read:
@@ -122,7 +129,7 @@ if args.align:
     if (not args.train) or (os.path.realpath(args.train) != 
                             os.path.realpath(args.align)):
         logging.info("Preparing corpus '{}'.".format(args.align))
-        corpus = Corpus(args.align, opts)
+        corpus = Corpus(args.align, opts, None)
     logging.info("Aligning corpus '{}'.".format(args.align))
     aligned = os.path.join(args.align, ALIGNED)
     scores = os.path.join(args.align, SCORES)
@@ -130,7 +137,7 @@ if args.align:
     logging.debug("Wrote MLF file to '{}'.".format(aligned))
     logging.debug("Wrote likelihood scores to '{}'.".format(scores))
     logging.info("Writing TextGrids.")
-    size = MLF(aligned).write(args.align)
+    size = MLF(aligned).write(args.align, SIL)
     if not size:
         logging.error("No paths found!")
         exit(1)
