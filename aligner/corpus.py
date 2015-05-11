@@ -254,7 +254,7 @@ DE {1}
                                     #get the boundaries' labels except for ...
                                     if(not val.strip('"') in [SP]):
                                         labels += val.strip('"') + '\n'
-                                    else
+                                    else:
                                         labels += SIL + '\n'
                         break
                 with open(os.path.join(self.labelsDir, os.path.basename(textgridfile).split('.')[0] + ".lab"), 'w') as labelFile:

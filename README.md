@@ -43,6 +43,8 @@ Gorman, Kyle, Jonathan Howell and Michael Wagner. 2011. Prosodylab-Aligner: A To
     -v                  Verbose output
 
     -V                  More verbose output
+	
+    -tg	                Directory of TextGrids to be used for bootstrapping
 
     Input Group:        Only one of the following arguments may be selected
 
@@ -55,8 +57,6 @@ Gorman, Kyle, Jonathan Howell and Michael Wagner. 2011. Prosodylab-Aligner: A To
     -a                  Directory of data to be aligned
 
     -w                  Location to write serialized model
-	
-    -tg	                Directory of TextGrids to be used for bootstrapping
 
 ## FAQ
 
