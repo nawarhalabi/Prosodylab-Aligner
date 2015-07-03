@@ -231,7 +231,8 @@ DE {1}
         """
         textgridfiles = glob(os.path.join(textgrids, "*.TextGrid"))
         for textgridfile in textgridfiles:
-            with open(textgridfile) as grid:
+            with open(textgridfile, errors="ignore") as grid:
+                print(textgridfile)
                 lines = grid.readlines()
                 labels = ""
                 for i in range(0, len(lines)):
