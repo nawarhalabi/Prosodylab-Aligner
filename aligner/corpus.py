@@ -29,7 +29,7 @@ import logging
 
 from re import match
 from glob import glob
-from shutil import rmtree
+from shutil import rmtree, copy
 from tempfile import mkdtemp
 from subprocess import check_call
 
@@ -223,6 +223,8 @@ DE {1}
         Compute audio features
         """
         check_call(["HCopy", "-C", self.HCopy_cfg, "-S", self.audio_scp])
+        for filename in glob(os.path.join(self.auddir, '*.*')):
+            copy(filename, "mfc/")
 
     def _prepare_labels_from_textgrids(self, textgrids):
         """
@@ -232,7 +234,6 @@ DE {1}
         textgridfiles = glob(os.path.join(textgrids, "*.TextGrid"))
         for textgridfile in textgridfiles:
             with open(textgridfile, errors="ignore") as grid:
-                print(textgridfile)
                 lines = grid.readlines()
                 labels = ""
                 for i in range(0, len(lines)):
@@ -253,13 +254,17 @@ DE {1}
                                     labels += str(int(float(val.strip('"')) * 10000000)) + ' '
                                 else:
                                     #get the boundaries' labels except for ...
-                                    if(not val.strip('"') in [SP]):
+                                    if(not val.strip('"') in [SP, "-"]):
                                         labels += val.strip('"') + '\n'
+                                    elif(val.strip('"') in ["-"]):
+                                        labels += "schwa\n"
                                     else:
                                         labels += SIL + '\n'
                         break
                 with open(os.path.join(self.labelsDir, os.path.basename(textgridfile).split('.')[0] + ".lab"), 'w') as labelFile:
-                    labelFile.write(labels.strip())
+                    labelFile.write(labels.rstrip())
+                with open(os.path.join("labels/", os.path.basename(textgridfile).split('.')[0] + ".lab"), 'w') as labelFile:
+                    labelFile.write(labels.rstrip()) #Just for testing purpose. This enables user to get all textgrids in label format after the bootstrapping
 
     def __del__(self):
         rmtree(self.tmpdir) 
