@@ -6,13 +6,13 @@ URL: http://prosodylab.org/tools/aligner/
 
 # basic features
 samplerate: 16000 # in Hz
-phoneset: [AH  , b   , t   , ^  , j   , H  , x  , d  , TH , r  ,
-           z   , s   , SH  , S   , D   , T  , Z  , E  , g  , f  ,
+phoneset: [<   , b   , t   , ^   , j   , H  , x  , d  , *  , r  ,
+           z   , s   , $   , S   , D   , T  , Z  , E  , g  , f  ,
            q   , k   , l   , m   , n   , h  , w  , y  , v  , p  ,
            J   , G   , aa  , uu0 , ii0 , a  , u0 , i0 , AA , UU0,
            II0 , A   , U0  , I0  , u1  , i1 , uu1, ii1, U1 , I1 ,
-           UU1 , II1 , AHAH, bb  , tt  , ^^ , jj , HH , xx , dd ,
-           THTH, rr  , zz  , ss  , SHSH, SS , DD , TT , ZZ , EE ,
+           UU1 , II1 , <<  , bb  , tt  , ^^ , jj , HH , xx , dd ,
+           **  , rr  , zz  , ss  , $$  , SS , DD , TT , ZZ , EE ,
            gg  , ff  , qq  , kk  , ll  , mm , nn , hh , ww , yy ,
            vv  , pp  , JJ  , GG]
 
